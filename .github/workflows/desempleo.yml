@@ -1,0 +1,34 @@
+name: Ejecutar petroleo.py diario
+
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 🕛 Ejecuta todos los días a las 12:00 UTC
+  workflow_dispatch:       # 🧑‍💻 Permite ejecutarlo manualmente desde GitHub
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: 🐍 Configurar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 📦 Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+
+      - name: ▶️ Ejecutar script
+        run: python desempleo.py
+
+      - name: 📤 Subir cambios al repositorio
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add petroleo.csv
+          git commit -m "🔄 Actualización automática de desempleo.csv"
+          git push
