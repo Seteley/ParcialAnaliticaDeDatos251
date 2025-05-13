@@ -1,6 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
+import csv
+from datetime import datetime  # ✅ Importar datetime
 
 # Lista de indicadores esperados
 indicadores_esperados = [
@@ -57,28 +58,41 @@ if response.status_code == 200:
     if tabla_div:
         filas = tabla_div.find_all('tr')
 
-        # Lista para almacenar los valores encontrados
         fila_datos = []
 
-        # Iterar sobre las filas de la tabla
         for i, fila in enumerate(filas):
             columnas = fila.find_all('td')
-            
             if len(columnas) >= 2:
-                # Extraer el valor del primer td (solo el valor)
                 valor = columnas[1].get_text(strip=True).replace(",", "")
                 fila_datos.append(valor)
 
-        # Completar la lista de datos con None si hay valores faltantes
+        # Rellenar con None si faltan datos
         while len(fila_datos) < len(indicadores_esperados):
             fila_datos.append(None)
 
-        # Crear DataFrame y guardar como CSV
-        df = pd.DataFrame([fila_datos], columns=indicadores_esperados)
-        df.to_csv('indicadores_relacionados.csv', index=False)
+        # 👉 Agregar la fecha y hora actual
+        fecha_actual = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        fila_datos.append(fecha_actual)
 
-        print("✅ CSV guardado como 'indicadores_relacionados.csv'")
+        # Escribir en el CSV (sin necesidad de usar pandas)
+        try:
+            # Abrir el archivo en modo append, para agregar sin sobrescribir
+            with open('indicadores_relacionados.csv', mode='a', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+
+                # Si el archivo está vacío, escribir los encabezados primero
+                if file.tell() == 0:
+                    writer.writerow(indicadores_esperados)
+
+                # Escribir la nueva fila de datos
+                writer.writerow(fila_datos)
+
+            print("✅ CSV actualizado con fecha y hora.")
+        except Exception as e:
+            print(f"❌ Error al escribir en el archivo CSV: {e}")
     else:
         print("❌ No se encontró el contenedor de la tabla de indicadores.")
 else:
     print(f"❌ Error {response.status_code} al acceder a la página.")
+
+print(f"📊 Datos extraídos: {fila_datos}")
