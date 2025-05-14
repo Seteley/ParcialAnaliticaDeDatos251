@@ -30,6 +30,7 @@ def clasificar_intencion(mensaje_usuario):
                 "- Consulta Pérdida Seguidores\n"
                 "- Ver Dashboard\n"
                 "- Despedida\n"
+                "- Cambiar de cuenta\n"
                 "- Otro\n\n"
                 "Responde únicamente con el nombre de la categoría, sin ninguna explicación adicional.\n\n"
                 f"Mensaje: '{mensaje_usuario}'"

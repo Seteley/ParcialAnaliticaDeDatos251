@@ -34,8 +34,7 @@ void setup() {
 void loop() {
   // Verificar si hay datos disponibles desde el puerto serial
   if (Serial.available() > 0) {
-    // Leer el nombre de usuario enviado desde Python
-    usuario = Serial.readString();
+    usuario = Serial.readString();  // Leer el nombre de usuario enviado desde Python
     usuario.trim();  // Eliminar espacios extra
 
     Serial.print("Nombre de usuario recibido: ");

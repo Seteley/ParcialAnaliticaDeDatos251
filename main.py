@@ -11,20 +11,20 @@ BOT_TOKEN = "7884267779:AAEvYsRU8GNbaBIGOIn81ZDitkkX5LTHPLA"
 user_data = {}
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Para hacer lo que me pides necesito tu usuario. ¿Cuál es tu nombre de usuario de Twitter?")
+    await update.message.reply_text("¿Cuál es tu nombre de usuario de Twitter?")
     return NOMBRE_USUARIO
 
 async def obtener_nombre_usuario(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    nombre_usuario = update.message.text
-    user_data[update.message.from_user.id] = nombre_usuario  # Guardamos el nombre de usuario
-    await update.message.reply_text(f"Gracias {nombre_usuario}! ¿En qué puedo ayudarte?")
+    nombre_usuario = update.message.text.strip()
+    user_data[update.message.from_user.id] = nombre_usuario  # Guardamos el nuevo nombre de usuario
+    await update.message.reply_text(f"¡Gracias, {nombre_usuario}! ¿En qué puedo ayudarte ahora?")
     return ConversationHandler.END
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_message = update.message.text
+    user_id = update.message.from_user.id
     intencion = clasificar_intencion(user_message)
 
-    # Si la intención es "Saludo" o "Despedida", no necesitamos pedir el nombre de usuario
     if intencion in ["Saludo", "Despedida"]:
         if intencion == "Saludo":
             respuesta = responder_saludo(user_message)
@@ -33,21 +33,27 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(respuesta)
         return
 
-    # Si no tenemos el nombre de usuario, lo solicitamos
-    if update.message.from_user.id not in user_data:
-        return await start(update, context)  # Pedir el nombre de usuario si no está registrado
+    if intencion == "Cambiar de cuenta":
+        user_data.pop(user_id, None)  # Eliminar la cuenta registrada anteriormente
+        await update.message.reply_text("Claro, indícame la nueva cuenta que quieres consultar.")
+        return await start(update, context)
 
-    # Si ya tenemos el nombre de usuario, continuamos con la clasificación de la intención
+    # Si no tenemos el nombre de usuario, lo solicitamos
+    if user_id not in user_data:
+        return await start(update, context)
+
+    # Lógica principal del bot con el nombre de usuario ya disponible
+    username = user_data[user_id]
     if intencion == "Consultar Seguidores":
-        respuesta = f"Actualmente, {user_data[update.message.from_user.id]} tienes 550 seguidores."
+        respuesta = f"Actualmente, {username}, tienes 550 seguidores."
     elif intencion == "Cambio Seguidores":
-        respuesta = f"¡Ganaste 25 seguidores hoy, {user_data[update.message.from_user.id]}!"
+        respuesta = f"¡Ganaste 25 seguidores hoy, {username}!"
     elif intencion == "Consulta Meta/Gráfico":
-        respuesta = "¡Aquí va tu gráfico!"
+        respuesta = f"¡Aquí va tu gráfico, {username}!"
     elif intencion == "Consulta Pérdida Seguidores":
-        respuesta = "Perdiste algunos seguidores, ¡ánimo!"
+        respuesta = f"Perdiste algunos seguidores, {username}. ¡Ánimo!"
     elif intencion == "Ver Dashboard":
-        respuesta = "Mostrándote el dashboard ahora."
+        respuesta = f"Mostrándote el dashboard ahora, {username}."
     else:
         respuesta = "No entendí bien. ¿Podrías reformularlo?"
 
