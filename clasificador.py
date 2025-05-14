@@ -1,10 +1,11 @@
 import requests
+import re
 
-API_BASE_URL = "https://api.cloudflare.com/client/v4/accounts/8d84ee30b071bb4000da4b51d58fb8ed/ai/run/"
-headers = {"Authorization": "Bearer e_-2c5fjDgOMZKKrbiNawggGd2qvG8vtWJZXukHb"}
+API_BASE_URL = "http://localhost:11434/v1/chat/completions"
+headers = {"Content-Type": "application/json"}
 
 def clasificar_intencion(mensaje_usuario):
-    model = "@cf/meta/llama-3-8b-instruct"
+    model = "qwen3:1.7b"
 
     inputs = [
         {
@@ -36,20 +37,30 @@ def clasificar_intencion(mensaje_usuario):
         }
     ]
 
-    response = requests.post(
-        f"{API_BASE_URL}{model}",
-        headers=headers,
-        json={"messages": inputs}
-    )
+    try:
+        response = requests.post(
+            API_BASE_URL,
+            headers=headers,
+            json={"model": model, "messages": inputs}
+        )
 
-    if response.status_code == 200:
-        data = response.json()
-        return data["result"]["response"].strip()
-    else:
-        print("Error:", response.status_code, response.text)
-        return "Error"
+        if response.status_code == 200:
+            data = response.json()
+            return obtener_respuesta(data["choices"][0]["message"]["content"].strip())
+        else:
+            print("Error:", response.status_code, response.text)
+            return "Error"
+    except requests.exceptions.RequestException as e:
+        print("Error de conexión:", e)
+        return "Error de conexión"
 
-# Ejemplo de uso
-mensaje = "buenos días, mi king"
-intencion = clasificar_intencion(mensaje)
-print("Intención:", intencion)
+def obtener_respuesta(texto):
+    # Eliminar contenido entre <think></think> y el salto de línea posterior
+    texto_limpio = re.sub(r'<think>.*?</think>\n?', '', texto, flags=re.DOTALL)
+    return texto_limpio.strip()
+
+# Prueba de la función
+if __name__ == "__main__":
+    mensaje = "Buenas, nos vemos más "
+    intencion = clasificar_intencion(mensaje)
+    print(intencion)
