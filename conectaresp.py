@@ -1,10 +1,7 @@
 import serial
 import time
 
-<<<<<<< HEAD
-=======
 # Función para enviar el nombre de usuario al ESP32
->>>>>>> fb2386b5050c2eddb07fcd3bb8c56df8b3af6f7f
 def enviar_nombre_usuario(nombre_usuario, puerto_com='COM4', velocidad_baudios=115200):
     try:
         # Conectar al puerto serial del ESP32
@@ -27,12 +24,9 @@ def enviar_nombre_usuario(nombre_usuario, puerto_com='COM4', velocidad_baudios=1
 
 # Llamar a la función con el nombre de usuario que deseas enviar
 nombre_usuario = "@elonmusk"
-<<<<<<< HEAD
-=======
 enviar_nombre_usuario(nombre_usuario)
 
 # Después de un tiempo, puedes cambiar el nombre de usuario dinámicamente:
 time.sleep(5)  # Espera 5 segundos
 nombre_usuario = "@cristiano"
->>>>>>> fb2386b5050c2eddb07fcd3bb8c56df8b3af6f7f
 enviar_nombre_usuario(nombre_usuario)
