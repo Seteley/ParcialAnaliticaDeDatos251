@@ -1,15 +1,18 @@
-import requests
+import serial
+import time
 
-# Dirección IP del ESP32 (cambia esta dirección por la IP de tu ESP32)
-esp32_ip = "http://192.168.1.100/set_usuario"  # IP del ESP32
-usuario = input("Introduce el nombre de usuario de Twitter: ")
+# Configurar el puerto serial para enviar el nombre de usuario al ESP32
+# Asegúrate de usar el puerto correcto (por ejemplo, COM3 en Windows o /dev/ttyUSB0 en Linux/Mac)
+ser = serial.Serial('/dev/ttyUSB0', 115200)  # Ajusta el puerto y la velocidad de baudios si es necesario
 
-# Realizar una solicitud POST al ESP32 para cambiar el nombre de usuario
-payload = {'usuario': usuario}  # El nombre de usuario que se va a enviar
-response = requests.post(esp32_ip, data=payload)
+# Nombre de usuario que deseas enviar
+nombre_usuario = "@elonmusk"
 
-# Comprobar la respuesta del ESP32
-if response.status_code == 200:
-    print(f"Nombre de usuario actualizado a: {usuario}")
-else:
-    print(f"Error al actualizar el nombre de usuario. Código de error: {response.status_code}")
+# Espera unos segundos para asegurar que el ESP32 se haya inicializado
+time.sleep(2)
+
+# Enviar el nombre de usuario al ESP32
+ser.write(nombre_usuario.encode())  # Convertir el string a bytes y enviarlo
+
+# Cerrar la comunicación serial
+ser.close()
