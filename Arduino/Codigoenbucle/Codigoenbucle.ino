@@ -29,16 +29,16 @@ void setup() {
   delay(1000);
 
   // Conexión WiFi
-  Serial.println("Conectando a WiFi...");
+  //Serial.println("Conectando a WiFi...");
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial.print(".");
+    //Serial.print(".");
   }
 
-  Serial.println("\n✅ WiFi conectado");
-  Serial.print("IP local: ");
-  Serial.println(WiFi.localIP());
+  //Serial.println("\n✅ WiFi conectado");
+  //Serial.print("IP local: ");
+  //Serial.println(WiFi.localIP());
 
   // Servidor HTTP
   server.on("/usuario", HTTP_GET, handleGetUsuario);
@@ -59,7 +59,7 @@ void loop() {
       int httpCode = http.GET();
       if (httpCode > 0) {
         ultimaRespuesta = http.getString();
-        Serial.println("📦 Respuesta recibida:");
+        // Serial.println("📦 Respuesta recibida:");
         Serial.println(ultimaRespuesta);
       } else {
         ultimaRespuesta = "{\"error\":\"Fallo en solicitud\"}";
