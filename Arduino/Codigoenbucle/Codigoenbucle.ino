@@ -1,7 +1,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 
-// Configuración de la red Wi-Fi
+// Configuración de la red Wi-Fi 
 const char* ssid = "MELVALUCAS";           // Nombre de la red Wi-Fi
 const char* password = "Contraseña";       // Contraseña de la red Wi-Fi
 
