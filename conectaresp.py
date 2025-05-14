@@ -1,38 +1,27 @@
-import serial
-import time
+import requests
 
-<<<<<<< HEAD
-=======
-# Función para enviar el nombre de usuario al ESP32
->>>>>>> fb2386b5050c2eddb07fcd3bb8c56df8b3af6f7f
-def enviar_nombre_usuario(nombre_usuario, puerto_com='COM4', velocidad_baudios=115200):
+def actualizar_nombre_usuario_api(usuario):
+    # URL de tu API Flask (ajústala si estás usando un dominio o IP distinta)
+    url = 'https://parcialanaliticadedatos251-1.onrender.com/nombre_usuario'  # Usa la IP de tu servidor si no es local
+
+    # Datos que se enviarán en formato JSON
+    datos = {
+        "nombre_usuario": usuario
+    }
+
     try:
-        # Conectar al puerto serial del ESP32
-        ser = serial.Serial(puerto_com, velocidad_baudios)
-        print(f"Conectado al puerto {puerto_com} a {velocidad_baudios} baudios")
+        # Realizar la solicitud POST con los datos JSON
+        response = requests.post(url, json=datos)
 
-        # Espera unos segundos para asegurar que el ESP32 se haya inicializado
-        time.sleep(2)
+        # Verificar si fue exitosa
+        if response.status_code == 200:
+            print("✅ Nombre de usuario actualizado correctamente:")
+            print(response.json())
+        else:
+            print(f"❌ Error al actualizar: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"⚠️ Error de conexión: {e}")
 
-        # Enviar el nombre de usuario al ESP32
-        ser.write(nombre_usuario.encode())  # Convertir el string a bytes y enviarlo
-        print(f"Nombre de usuario '{nombre_usuario}' enviado al ESP32.")
-
-        # Cerrar la comunicación serial
-        ser.close()
-        print("Comunicación serial cerrada.")
-    
-    except serial.SerialException as e:
-        print(f"Error al intentar conectar con el puerto {puerto_com}: {e}")
-
-# Llamar a la función con el nombre de usuario que deseas enviar
-nombre_usuario = "@elonmusk"
-<<<<<<< HEAD
-=======
-enviar_nombre_usuario(nombre_usuario)
-
-# Después de un tiempo, puedes cambiar el nombre de usuario dinámicamente:
-time.sleep(5)  # Espera 5 segundos
-nombre_usuario = "@cristiano"
->>>>>>> fb2386b5050c2eddb07fcd3bb8c56df8b3af6f7f
-enviar_nombre_usuario(nombre_usuario)
+# Ejemplo de uso
+usuario = "elonmusk"
+actualizar_nombre_usuario_api(usuario)

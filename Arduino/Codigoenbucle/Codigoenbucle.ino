@@ -1,75 +1,73 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WebServer.h>
 
-// Configuración de la red Wi-Fi 
-const char* ssid = "MELVALUCAS";           // Nombre de la red Wi-Fi
-const char* password = "Contraseña";       // Contraseña de la red Wi-Fi
+// Wi-Fi
+const char* ssid = "MELVALUCAS";
+const char* password = "GMS162030";
 
-// Dirección base de la API o servidor
-const char* baseUrl = "https://parcialanaliticadedatos251-1.onrender.com/";
+// URL fija
+const char* url = "https://parcialanaliticadedatos251-1.onrender.com/monitoreo/nombre_usuario";
 
-// Nombre de usuario por defecto
-String usuario = "elonmusk";  // Nombre de usuario inicial
+// Servidor web en el puerto 80
+WebServer server(80);
+
+// Última respuesta recibida
+String ultimaRespuesta = "{}";
+
+// Temporizador
+unsigned long ultimaConsulta = 0;
+const unsigned long intervaloConsulta = 10000; // 10 segundos
+
+// Manejador de la ruta /usuario
+void handleGetUsuario() {
+  server.send(200, "application/json", ultimaRespuesta);
+}
 
 void setup() {
-  // Iniciar el monitor serial
   Serial.begin(115200);
   delay(1000);
 
-  // Conectar a la red Wi-Fi
+  // Conexión WiFi
   Serial.println("Conectando a WiFi...");
   WiFi.begin(ssid, password);
-
-  // Esperar hasta que esté conectado
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(".");
   }
-  Serial.println("\nConexión WiFi establecida");
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());  // Imprime la dirección IP asignada
-  Serial.println("Esperando nombre de usuario desde Python...");
+
+  Serial.println("\n✅ WiFi conectado");
+  Serial.print("IP local: ");
+  Serial.println(WiFi.localIP());
+
+  // Servidor HTTP
+  server.on("/usuario", HTTP_GET, handleGetUsuario);
+  server.begin();
 }
 
 void loop() {
-  // Verificar si hay datos disponibles desde el puerto serial
-  if (Serial.available() > 0) {
-    usuario = Serial.readString();  // Leer el nombre de usuario enviado desde Python
-    usuario.trim();  // Eliminar espacios extra
+  server.handleClient();
 
-    Serial.print("Nombre de usuario recibido: ");
-    Serial.println(usuario);  // Mostrar el nombre de usuario recibido
-  }
+  // Ejecutar GET cada 10 segundos
+  if (millis() - ultimaConsulta >= intervaloConsulta) {
+    ultimaConsulta = millis();
 
-  // Construir la URL dinámica con el nombre de usuario
-  String url = baseUrl + usuario;  // Ejemplo: "https://parcialanaliticadedatos251-1.onrender.com/monitoreo/elonmusk"
+    if (WiFi.status() == WL_CONNECTED) {
+      HTTPClient http;
+      http.begin(url);
 
-  // Realizar la solicitud HTTP cada 10 segundos
-  if (WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-
-    // Especifica la URL completa del servidor con el nombre de usuario
-    http.begin(url);
-
-    // Realiza la solicitud GET
-    int httpCode = http.GET();
-
-    // Si la solicitud fue exitosa, imprime los resultados
-    if (httpCode > 0) {
-      String payload = http.getString();
-      Serial.println("Respuesta del servidor:");
-      Serial.println(payload);
+      int httpCode = http.GET();
+      if (httpCode > 0) {
+        ultimaRespuesta = http.getString();
+        Serial.println("📦 Respuesta recibida:");
+        Serial.println(ultimaRespuesta);
+      } else {
+        ultimaRespuesta = "{\"error\":\"Fallo en solicitud\"}";
+        Serial.printf("❌ Error HTTP: %s\n", http.errorToString(httpCode).c_str());
+      }
+      http.end();
     } else {
-      // En caso de error en la solicitud
-      Serial.printf("Error en la solicitud HTTP: %s\n", http.errorToString(httpCode).c_str());
+      Serial.println("❌ WiFi desconectado");
     }
-
-    // Cierra la conexión HTTP
-    http.end();
-  } else {
-    Serial.println("No se pudo conectar a la red Wi-Fi");
   }
-
-  // Esperar 10 segundos antes de la siguiente ejecución
-  delay(10000);  // 10000 ms = 10 segundos
 }
