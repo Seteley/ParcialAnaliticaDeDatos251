@@ -22,8 +22,8 @@ def clasificar_intencion(mensaje_usuario):
             "role": "user",
             "content": (
                 "Clasifica la intención del siguiente mensaje del usuario en una de las siguientes categorías:\n"
-                "- Inicio\n"
                 "- Saludo\n"
+                "- Información sobre el chatbot\n"
                 "- Consultar número de Seguidores\n"
                 "- Consultar cambio de Seguidores\n"
                 "- Consultar Meta de seguidores\n"
@@ -64,3 +64,11 @@ if __name__ == "__main__":
     mensaje = "Buenas, nos vemos más "
     intencion = clasificar_intencion(mensaje)
     print(intencion)
+
+"""
+entidades
+nombre_usuario
+"""
+
+# si la intención es distinta del saludo o despedida o información pida el nombre de usuario la primera vez
+# si la intención cambiar usuario se cambia el nombre_usuario

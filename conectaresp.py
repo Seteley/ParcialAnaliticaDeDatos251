@@ -87,5 +87,5 @@ def consultar_serial(puerto="COM4", baudrate=115200, timeout=5, nombre_archivo="
         print(f"❌ Error al abrir el puerto serial: {e}")
 
 # Llamada a la función, ahora puedes pasar el nombre del archivo JSON
-nombre_archivo = "seguidores_musk.json"  # Puedes cambiar este nombre
+nombre_archivo = "seguidores_elonmusk.json"  # Puedes cambiar este nombre
 consultar_serial(nombre_archivo=nombre_archivo)
