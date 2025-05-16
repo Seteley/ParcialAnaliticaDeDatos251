@@ -17,7 +17,7 @@ String ultimaRespuesta = "{}";
 
 // Temporizador
 unsigned long ultimaConsulta = 0;
-const unsigned long intervaloConsulta = 10000; // 10 segundos
+const unsigned long intervaloConsulta = 5000; // 10 segundos
 
 // Manejador de la ruta /usuario
 void handleGetUsuario() {
@@ -63,11 +63,11 @@ void loop() {
         Serial.println(ultimaRespuesta);
       } else {
         ultimaRespuesta = "{\"error\":\"Fallo en solicitud\"}";
-        Serial.printf("❌ Error HTTP: %s\n", http.errorToString(httpCode).c_str());
+        //Serial.printf("❌ Error HTTP: %s\n", http.errorToString(httpCode).c_str());
       }
       http.end();
     } else {
-      Serial.println("❌ WiFi desconectado");
-    }
-  }
+      //Serial.println("❌ WiFi desconectado");
+    }
+  }
 }
