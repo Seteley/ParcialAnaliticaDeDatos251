@@ -2,6 +2,7 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters, ConversationHandler
 from clasificador import clasificar_intencion
 from responder_qwen import responder_saludo, responder_despedida
+from funcionesauxiliar import obtener_link_dashboard
 
 # Estados de la conversación
 NOMBRE_USUARIO = 1
@@ -44,16 +45,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Lógica principal del bot con el nombre de usuario ya disponible
     username = user_data[user_id]
-    if intencion == "Consultar Seguidores":
+    if intencion == "Consultar seguidores":
         respuesta = f"Actualmente, {username}, tienes 550 seguidores."
-    elif intencion == "Cambio Seguidores":
+    elif intencion == "Cambio seguidores":
         respuesta = f"¡Ganaste 25 seguidores hoy, {username}!"
-    elif intencion == "Ver Dashboard":
-        respuesta = f"¡Aquí va tu gráfico, {username}!. Entra aquí: https://bd84-2001-1388-b6f-1617-89a0-e82e-aad9-a6ef.ngrok-free.app/"
-    elif intencion == "Consulta Pérdida Seguidores":
-        respuesta = f"Perdiste algunos seguidores, {username}. ¡Ánimo!"
-    elif intencion == "Ver Dashboard":
-        respuesta = f"Mostrándote el dashboard ahora, {username}."
+    elif intencion == "Ver Dashboard o gráfico":
+        url_ngrok = obtener_link_dashboard()
+        respuesta = f"¡Aquí va tu gráfico, {username}! Entra aquí: {url_ngrok}"
     else:
         respuesta = "No entendí bien. ¿Podrías reformularlo?"
 

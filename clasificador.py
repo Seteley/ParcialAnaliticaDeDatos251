@@ -27,7 +27,7 @@ def clasificar_intencion(mensaje_usuario):
                 "- Consultar número de Seguidores\n"
                 "- Consultar cambio de Seguidores\n"
                 "- Consultar Meta de seguidores\n"
-                "- Ver Dashboard\n"
+                "- Ver Dashboard o gráfico\n"
                 "- Despedida\n"
                 "- Cambiar de cuenta\n"
                 "- Otro\n\n"
