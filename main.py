@@ -49,7 +49,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif intencion == "Cambio Seguidores":
         respuesta = f"¡Ganaste 25 seguidores hoy, {username}!"
     elif intencion == "Ver Dashboard":
-        respuesta = f"¡Aquí va tu gráfico, {username}!. Entra aquí: http://127.0.0.1:8050/"
+        respuesta = f"¡Aquí va tu gráfico, {username}!. Entra aquí: https://bd84-2001-1388-b6f-1617-89a0-e82e-aad9-a6ef.ngrok-free.app/"
     elif intencion == "Consulta Pérdida Seguidores":
         respuesta = f"Perdiste algunos seguidores, {username}. ¡Ánimo!"
     elif intencion == "Ver Dashboard":

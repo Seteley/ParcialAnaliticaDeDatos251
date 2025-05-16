@@ -19,13 +19,11 @@ def actualizar_nombre_usuario_api(usuario):
 
         # Verificar si fue exitosa
         if response.status_code == 200:
-            print("✅ Nombre de usuario actualizado correctamente:")
-            print(response.json())
+            pass  # Aquí no se imprime nada si es exitoso
         else:
-            print(f"❌ Error al actualizar: {response.status_code} - {response.text}")
+            pass  # Aquí no se imprime nada si hay error en la respuesta
     except Exception as e:
-        print(f"⚠️ Error de conexión: {e}")
-
+        pass  # No imprimir nada en caso de error
 
 def guardar_datos_en_json(datos, nombre_archivo="datos.json"):
     # Asegurar que la carpeta 'datos_json' exista
@@ -54,8 +52,6 @@ def guardar_datos_en_json(datos, nombre_archivo="datos.json"):
 def consultar_serial(puerto="COM4", baudrate=115200, timeout=5, nombre_archivo="datos.json"):
     try:
         with serial.Serial(puerto, baudrate, timeout=timeout) as ser:
-            print(f"📡 Escuchando en {puerto}, guardando datos en 'datos_json/{nombre_archivo}'...")
-
             buffer_json = ""
             leyendo_json = False
 
@@ -63,8 +59,6 @@ def consultar_serial(puerto="COM4", baudrate=115200, timeout=5, nombre_archivo="
                 linea = ser.readline().decode('utf-8', errors='ignore').strip()
                 if not linea:
                     continue
-
-                print(f"🟢 Recibido: {linea}")
 
                 if "{" in linea:
                     buffer_json = ""
@@ -76,15 +70,11 @@ def consultar_serial(puerto="COM4", baudrate=115200, timeout=5, nombre_archivo="
                         leyendo_json = False
                         try:
                             data = json.loads(buffer_json)
-                            print("✅ JSON válido:")
-                            print(json.dumps(data, indent=2, ensure_ascii=False))
-
                             guardar_datos_en_json(data, nombre_archivo)
                         except json.JSONDecodeError as e:
-                            print(f"❌ Error al decodificar JSON: {e}")
                             buffer_json = ""
     except serial.SerialException as e:
-        print(f"❌ Error al abrir el puerto serial: {e}")
+        pass  # No imprimir nada en caso de error al abrir el puerto serial
 
 # Llamada a la función, ahora puedes pasar el nombre del archivo JSON
 nombre_archivo = "seguidores_elonmusk.json"  # Puedes cambiar este nombre

@@ -109,7 +109,7 @@ def crear_dashboard():
                 datos = json.load(f)
 
             df = pd.DataFrame(datos)
-            df['hora'] = pd.to_datetime(df['hora'])
+            df['hora'] = pd.to_datetime(df['hora'], format='%d-%m-%Y %H:%M:%S')
             df = df.sort_values('hora')
 
             horas_str = df['hora'].dt.strftime('%H:%M:%S').tolist()
@@ -150,7 +150,7 @@ def crear_dashboard():
                 raise ValueError("El archivo está vacío.")
 
             df = pd.DataFrame(datos)
-            df['hora'] = pd.to_datetime(df['hora'])
+            df['hora'] = pd.to_datetime(df['hora'], format='%d-%m-%Y %H:%M:%S')
             df = df.sort_values('hora')
 
             i_ini, i_fin = rango if rango else (0, len(df)-1)
