@@ -75,7 +75,3 @@ def consultar_serial(puerto="COM4", baudrate=115200, timeout=5, nombre_archivo="
                             buffer_json = ""
     except serial.SerialException as e:
         pass  # No imprimir nada en caso de error al abrir el puerto serial
-
-# Llamada a la función, ahora puedes pasar el nombre del archivo JSON
-nombre_archivo = "seguidores_elonmusk.json"  # Puedes cambiar este nombre
-consultar_serial(nombre_archivo=nombre_archivo)
