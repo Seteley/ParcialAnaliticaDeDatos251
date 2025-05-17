@@ -11,18 +11,23 @@ def crear_dashboard():
     app.title = "Dashboard X"
 
     # Crear resumen textual
-    def crear_resumen(seguidores_actual, seguidores_inicial, nombre_usuario):
-        variacion = seguidores_actual - seguidores_inicial
-        signo = "+" if variacion >= 0 else ""
-        texto_variacion = f"{signo}{variacion:,} seguidores en el rango seleccionado"
+    def crear_resumen(seguidores_actual, seguidores_inicial, tweets_actual, tweets_inicial, nombre_usuario):
+        variacion_seguidores = seguidores_actual - seguidores_inicial
+        variacion_tweets = tweets_actual - tweets_inicial
+
+        signo_seguidores = "+" if variacion_seguidores >= 0 else ""
+        signo_tweets = "+" if variacion_tweets >= 0 else ""
+
+        texto_seguidores = f"{signo_seguidores}{variacion_seguidores:,} en el rango"
+        texto_tweets = f"{signo_tweets}"
 
         return html.Div([
             html.Span(f"👤 @{nombre_usuario} — "),
-            html.Span(f"📈 Seguidores actuales: {seguidores_actual:,} — "),
-            html.Span(f"📊 Variación: {texto_variacion}")
+            html.Span(f"📈 Seguidores actuales: {seguidores_actual:,} ({texto_seguidores}) — "),
+            html.Span(f"📝 Tweets actuales: {tweets_actual:,}")
         ])
 
-    # Crear gráfico
+    # Crear gráfico de seguidores
     def crear_grafico(df_rango, nombre_usuario):
         fig = go.Figure()
         fig.add_trace(go.Scatter(
@@ -37,6 +42,25 @@ def crear_dashboard():
             xaxis_title='Hora',
             yaxis_title='Seguidores',
             title=f'Evolución de seguidores de @{nombre_usuario}',
+            template='plotly_white'
+        )
+        return fig
+
+    # Crear gráfico de tweets
+    def crear_grafico_tweets(df_rango, nombre_usuario):
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(
+            x=df_rango['hora'].dt.strftime('%H:%M:%S'),
+            y=df_rango['tweets'],
+            mode='lines+markers',
+            line=dict(color='orange'),
+            name='Tweets'
+        ))
+
+        fig.update_layout(
+            xaxis_title='Hora',
+            yaxis_title='Tweets',
+            title=f'Evolución de tweets de @{nombre_usuario}',
             template='plotly_white'
         )
         return fig
@@ -79,6 +103,8 @@ def crear_dashboard():
         html.Div(id='progreso-meta', style={'marginBottom': '30px'}),
 
         dcc.Graph(id='grafico-seguidores'),
+
+        dcc.Graph(id='grafico-tweets'),
 
         dcc.RangeSlider(id='rango-tiempo', step=1, allowCross=False,
                         tooltip={"placement": "bottom", "always_visible": True}),
@@ -126,6 +152,7 @@ def crear_dashboard():
     @app.callback(
         Output('datos-actuales', 'children'),
         Output('grafico-seguidores', 'figure'),
+        Output('grafico-tweets', 'figure'),
         Output('progreso-meta', 'children'),
         Input('intervalo-actualizacion', 'n_intervals'),
         Input('rango-tiempo', 'value')
@@ -158,16 +185,19 @@ def crear_dashboard():
 
             seguidores_actual = df_rango['seguidores'].iloc[-1]
             seguidores_inicial = df_rango['seguidores'].iloc[0]
+            tweets_actual = df_rango['tweets'].iloc[-1]
+            tweets_inicial = df_rango['tweets'].iloc[0]
 
-            resumen = crear_resumen(seguidores_actual, seguidores_inicial, nombre_usuario)
+            resumen = crear_resumen(seguidores_actual, seguidores_inicial, tweets_actual, tweets_inicial, nombre_usuario)
             grafico = crear_grafico(df_rango, nombre_usuario)
+            grafico_tweets = crear_grafico_tweets(df_rango, nombre_usuario)
             barra_progreso = crear_barra_meta(seguidores_actual, meta)
 
-            return resumen, grafico, barra_progreso
+            return resumen, grafico, grafico_tweets, barra_progreso
 
         except Exception as e:
             error_texto = html.Div(f"Error al obtener datos: {e}", style={'color': 'red'})
-            return error_texto, go.Figure(), html.Div()
+            return error_texto, go.Figure(), go.Figure(), html.Div()
 
     app.run(debug=True)
 
