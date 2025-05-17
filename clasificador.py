@@ -23,7 +23,7 @@ def clasificar_intencion(mensaje_usuario):
             "content": (
                 "Clasifica la intención del siguiente mensaje del usuario en una de las siguientes categorías:\n"
                 "- Saludo\n"
-                "- Información sobre el chatbot\n"
+                "- Actualizar meta de seguidores\n"
                 "- Consultar número de Seguidores\n"
                 "- Consultar cambio de Seguidores\n"
                 "- Consultar Meta de seguidores\n"

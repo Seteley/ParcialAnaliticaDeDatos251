@@ -155,6 +155,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             respuesta = responder_despedida(user_message)
             await update.message.reply_text(respuesta)
             return
+        elif intencion == "Actualizar meta de seguidores":
+            user_data[user_id]["estado"] = "esperando_meta"
+            await update.message.reply_text("Claro, dime cuál es tu nueva meta de seguidores.")
+            return
 
         if intencion == "Consultar número de Seguidores":
             ruta_archivo = f"datos_json/seguidores_{nombre_usuario}.json"
@@ -176,18 +180,15 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             try:
                 with open(ruta_archivo, "r", encoding="utf-8") as f:
                     datos_seguidores = json.load(f)
+
                 if datos_seguidores:
-                    # Último registro (más reciente)
                     ultimo_registro = datos_seguidores[-1]
                     seguidores_ultimo = ultimo_registro.get("seguidores", 0)
 
-                    # Primer registro de todo el historial
                     primer_registro = datos_seguidores[0]
                     seguidores_inicio = primer_registro.get("seguidores", 0)
 
-                    # Filtrar registros del día actual (según formato "dd-mm-yyyy hh:mm:ss")
                     from datetime import datetime
-
                     hoy_str = datetime.now().strftime("%d-%m-%Y")
                     registros_hoy = [reg for reg in datos_seguidores if reg["hora"].startswith(hoy_str)]
 
@@ -196,20 +197,31 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                         seguidores_primero_hoy = primero_hoy.get("seguidores", 0)
                         cambio_hoy = seguidores_ultimo - seguidores_primero_hoy
                     else:
-                        cambio_hoy = 0  # No hay registros hoy
+                        cambio_hoy = 0
 
                     cambio_inicio = seguidores_ultimo - seguidores_inicio
 
-                    respuesta = (
-                        f"@{nombre_usuario}, has ganado {cambio_hoy} seguidores hoy "
-                        f"y {cambio_inicio} seguidores desde que empezamos a registrar."
-                    )
+                    def format_cambio(cambio, periodo):
+                        if cambio > 0:
+                            return f"Felicidades, has ganado {cambio} seguidores {periodo}, sigue así."
+                        elif cambio < 0:
+                            return f"Lamentablemente has perdido {abs(cambio)} seguidores {periodo}, se puede mejorar."
+                        else:
+                            return f"No has tenido cambios de seguidores {periodo}"
+
+                    texto_hoy = format_cambio(cambio_hoy, "hoy")
+                    texto_total = format_cambio(cambio_inicio, "desde que empezamos a registrar")
+
+                    respuesta = f"@{nombre_usuario}, {texto_hoy} y {texto_total}."
+
                 else:
                     respuesta = f"No hay datos de seguidores disponibles para @{nombre_usuario}."
+
             except FileNotFoundError:
                 respuesta = f"No se encontró el archivo de datos para @{nombre_usuario}."
             except Exception as e:
                 respuesta = f"Error al leer los datos de seguidores: {e}"
+
 
         elif intencion == "Ver Dashboard o gráfico":
             try:
