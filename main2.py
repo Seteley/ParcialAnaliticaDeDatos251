@@ -5,6 +5,8 @@ import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, MessageHandler, filters
+import os
+import sys
 
 from clasificador import clasificar_intencion
 from responder_qwen import responder_saludo, responder_despedida
@@ -80,6 +82,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "estado": "esperando_usuario"
         }
         await update.message.reply_text("Claro, ¿cuál es tu nueva cuenta de Twitter? (sin el @)")
+        os.execv(sys.executable, ['python'] + sys.argv)
         return
 
     # Estado: esperando saludo inicial
