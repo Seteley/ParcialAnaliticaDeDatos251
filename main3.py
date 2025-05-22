@@ -98,7 +98,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         posible_usuario = extraer_username(user_message)
         if posible_usuario:
             posible_usuario = posible_usuario.lower()
+        
         if posible_usuario:
+            # Verificar si el usuario es "unioficial" y asignar "UNI"
+            if posible_usuario == "unioficial":
+                posible_usuario = "UNI"
+            
             user_data[user_id]["nombre_usuario"] = posible_usuario
             user_data[user_id]["estado"] = "esperando_meta"
             await actualizar_json_y_api(posible_usuario)  # Solo usuario
